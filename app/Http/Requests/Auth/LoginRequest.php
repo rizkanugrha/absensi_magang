@@ -21,15 +21,23 @@ class LoginRequest extends FormRequest
         return [
             'user_id' => ['required', 'string'],
             'password' => ['required', 'string'],
-            'role' => ['required', 'in:admin,peserta'],
+            'role' => ['required', 'string'],
         ];
     }
 
+    // Old
+/*
+        $credentials = $this->only('user_id', 'password');
+
+        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
+*/
+
+    // ✅ FIX: Include 'role' in the credentials to enforce an exact match during authentication.
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        $credentials = $this->only('user_id', 'password');
+        $credentials = $this->only('user_id', 'password', 'role');
 
         if (!Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());

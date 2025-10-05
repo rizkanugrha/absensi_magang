@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Peserta;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Http\Controllers\Controller;
+
 
 class AttendanceController extends Controller
 {
@@ -28,7 +30,7 @@ class AttendanceController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('attendance.index', compact('attendances'));
+        return view('peserta.attendance.index', compact('attendances'));
     }
 
     public function checkIn(Request $request)
@@ -38,7 +40,7 @@ class AttendanceController extends Controller
         ]);
 
         $userId = Auth::id();
-        if (! $userId) {
+        if (!$userId) {
             return redirect()->route('login');
         }
 
@@ -70,7 +72,7 @@ class AttendanceController extends Controller
         ]);
 
         $userId = Auth::id();
-        if (! $userId) {
+        if (!$userId) {
             return redirect()->route('login');
         }
 
@@ -80,10 +82,8 @@ class AttendanceController extends Controller
             $folder = 'check_out_photos';
             $path = $this->savePhoto($photoData, $folder);
 
-            $attendance = Attendance::where('user_id', $userId)
-                ->where('date', now($this->tz)->toDateString())
-                ->first();
-
+            // Old Code snippet around line 82:
+/*
             if ($attendance) {
                 $attendance->update([
                     'check_out' => now($this->tz)->format('H:i:s'),
@@ -102,10 +102,38 @@ class AttendanceController extends Controller
             }
 
             return back()->with('success', 'Absen keluar berhasil!');
+*/
+
+            // ✅ FIX: Enforce check-in must exist and check-out must not exist yet.
+            $attendance = Attendance::where('user_id', $userId)
+                ->where('date', now($this->tz)->toDateString())
+                ->first();
+
+            if (!$attendance) {
+                return back()->with('error', 'Anda belum melakukan absen masuk hari ini.');
+            }
+
+            if ($attendance->check_out) {
+                return back()->with('error', 'Anda sudah melakukan absen keluar hari ini.');
+            }
+
+            if (!$attendance->check_in) {
+                // Should not happen if checkIn uses updateOrCreate correctly, but good fail-safe
+                return back()->with('error', 'Terjadi kesalahan: Absen masuk belum tercatat dengan benar.');
+            }
+
+            // Proceed with update since check-in exists and check-out is null
+            $attendance->update([
+                'check_out' => now($this->tz)->format('H:i:s'),
+                'check_out_photo' => $path,
+                'daily_report' => $request->daily_report,
+            ]);
+
+            return back()->with('success', 'Absen keluar berhasil!');
         }
 
         return back()->with('error', 'Foto gagal diambil.');
-    }
+    } // ... rest of the file
 
     /**
      * Simpan data URI base64 sebagai file di storage/public/<folder>
@@ -118,7 +146,8 @@ class AttendanceController extends Controller
             [$meta, $data] = explode(',', $photoData, 2);
             if (preg_match('/^data:image\/(\w+);base64$/', $meta, $m)) {
                 $ext = $m[1];
-                if ($ext === 'jpeg') $ext = 'jpg';
+                if ($ext === 'jpeg')
+                    $ext = 'jpg';
             } else {
                 $ext = 'jpg';
             }
@@ -154,7 +183,7 @@ class AttendanceController extends Controller
 
         $attendances = $query->orderBy('date', 'desc')->paginate(10);
 
-        return view('attendance.rekap', compact('attendances'));
+        return view('peserta.attendance.rekap', compact('attendances'));
 
     }
 }

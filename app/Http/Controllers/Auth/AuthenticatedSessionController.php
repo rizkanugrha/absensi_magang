@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         // Redirect sesuai role
         return match (Auth::user()->role) {
             'admin' => redirect()->intended('/admin/dashboard'),
-            'peserta' => redirect()->intended('/dashboard'),
+            'peserta' => redirect()->intended('/peserta/dashboard'),
             default => redirect('/'),
         };
     }
@@ -44,6 +44,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }
