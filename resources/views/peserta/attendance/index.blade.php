@@ -15,7 +15,8 @@
             </div>
             <nav class="mt-6">
                 {{-- ✅ FIX 1: Menggunakan rute dashboard peserta yang benar --}}
-                <a href="{{ route('peserta.dashboard') }}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
+                <a href="{{ route('peserta.dashboard') }}"
+                    class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path d="M10 2a8 8 0 100 16 8 8 0 000-16z" />
@@ -122,14 +123,29 @@
         {{-- Script WebcamJS --}}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
         <script>
+
             Webcam.set({
-                width: 480,
-                height: 360,
+                width: 320,        // Tentukan lebar
+                height: 240,       // Tentukan tinggi
                 image_format: 'jpeg',
-                jpeg_quality: 90
+                jpeg_quality: 90,
+                // Coba tambahkan baris berikut untuk menentukan resolusi video yang diminta
+                // Ini membantu browser tidak perlu bernegosiasi terlalu lama
+                constraints: {
+                    width: 1280,
+                    height: 720,
+                    facingMode: "user" // Gunakan kamera depan
+                }
             });
+
             Webcam.attach('#my_camera');
 
+            // Terapkan penanganan error yang lebih jelas
+            Webcam.on('error', function (err) {
+                // Memberi tahu pengguna mengapa akses gagal
+                document.getElementById('webcam_status').innerHTML = 'Gagal mengakses kamera. Mohon pastikan kamera tidak digunakan aplikasi lain dan berikan izin di browser Anda. Detail Error: ' + err.name;
+                // Pilihan: Berikan tombol untuk mencoba ulang atau gunakan fallback
+            });
             let lastPhoto = '';
 
             function take_snapshot() {
