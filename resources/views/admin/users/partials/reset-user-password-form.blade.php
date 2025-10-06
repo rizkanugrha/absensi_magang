@@ -9,7 +9,7 @@
         </p>
     </header>
 
-    <form method="POST" action="{{ route('admin.users.update', $user) }}" class="mt-6 space-y-6">
+    <form method="POST" action="{{ route('admin.users.updatePassword', $user) }}" class="mt-6 space-y-6">
         @csrf
         @method('PATCH')
 
@@ -26,7 +26,10 @@
             <x-input-label for="password_confirmation" :value="__('Konfirmasi Kata Sandi Baru')" />
             <x-text-input id="password_confirmation" name="password_confirmation" type="password"
                 class="mt-1 block w-full" required autocomplete="new-password" />
-            <x-input-error class="mt-2" :messages="$errors->get('password_confirmation')" />
+
+            {{-- Logic ini menampilkan error 'password_confirmation' jika ada (required),
+            atau menampilkan error 'password.confirmed' (ketidakcocokan) --}}
+            <x-input-error class="mt-2" :messages="$errors->get('password_confirmation') ?? $errors->get('password.confirmed')" />
         </div>
 
         <div class="flex items-center gap-4">

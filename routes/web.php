@@ -25,7 +25,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('/admin/users', UserManagement::class, [
         'names' => 'admin.users',
     ]);
-    Route::post('/admin/users/{user}/password', [UserManagement::class, 'updatePassword'])->name('admin.users.updatePassword');
+    Route::patch('/users/{user}/password', [UserManagement::class, 'updatePassword'])->name('admin.users.updatePassword');
+
     // MANAJEMEN ABSENSI (CRUD)
     Route::resource('/admin/attendances', AttendanceAdminController::class, [
         'names' => 'admin.attendances',

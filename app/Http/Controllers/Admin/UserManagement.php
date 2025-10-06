@@ -37,10 +37,11 @@ class UserManagement extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:5', 'max:255'],
             'user_id' => ['required', 'string', 'max:255', 'unique:users,user_id'],
             'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'password_confirmation' => ['required'],
             'role' => ['required', Rule::in(['peserta', 'admin'])],
             'jurusan' => ['required', 'string', 'max:255'],
             'instansi' => ['required', 'string', 'max:255'],
@@ -74,14 +75,12 @@ class UserManagement extends Controller
     public function update(Request $request, User $user): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            // user_id harus unik, mengabaikan ID user yang sedang diedit
-            'user_id' => ['required', 'string', 'max:255', Rule::unique('users', 'user_id')->ignore($user)],
-            // email harus unik, mengabaikan ID user yang sedang diedit
-            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
-            'role' => ['required', Rule::in(['peserta', 'admin'])],
-            'jurusan' => ['required', 'string', 'max:255'],
-            'instansi' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'min:5', 'max:255'],
+            'user_id' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'user_id')->ignore($user->id)],
+            'email' => ['sometimes', 'nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['sometimes', Rule::in(['peserta', 'admin'])],
+            'jurusan' => ['sometimes', 'string', 'max:255'],
+            'instansi' => ['sometimes', 'string', 'max:255'],
         ]);
 
         $user->update($data);
@@ -97,6 +96,8 @@ class UserManagement extends Controller
         // Validasi, pastikan ada password baru dan konfirmasinya
         $request->validate([
             'password' => ['required', 'confirmed', Password::defaults()],
+            'password_confirmation' => ['required'],
+
         ]);
 
         // Update password pengguna
@@ -105,7 +106,7 @@ class UserManagement extends Controller
         ]);
 
         // Redirect kembali ke halaman edit dengan pesan sukses
-        return redirect()->route('admin.users.edit', $user)->with('success', 'Kata sandi peserta berhasil diperbarui!');
+        return redirect()->route('admin.users.index', $user)->with('success', 'Kata sandi peserta berhasil diperbarui!');
     }
 
     /**

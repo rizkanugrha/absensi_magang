@@ -17,14 +17,14 @@
         <div>
             <x-input-label for="name" :value="__('Nama Lengkap')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)"
-                required autofocus autocomplete="name" />
+                autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         {{-- ID Peserta (User ID) --}}
         <div>
             <x-input-label for="user_id" :value="__('ID Peserta (NIP/NIM/Stambuk)')" />
-            <x-text-input id="user_id" name="user_id" type="text" class="mt-1 block w-full" :value="old('user_id', $user->user_id)" required autocomplete="username" />
+            <x-text-input id="user_id" name="user_id" type="text" class="mt-1 block w-full" :value="old('user_id', $user->user_id)" autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('user_id')" />
         </div>
 
@@ -39,8 +39,7 @@
         <div>
             <x-input-label for="role" :value="__('Role / Peran')" />
             <select id="role" name="role"
-                class="mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full"
-                required>
+                class="mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full">
                 <option value="peserta" {{ (old('role', $user->role) == 'peserta') ? 'selected' : '' }}>Peserta Magang
                 </option>
                 <option value="admin" {{ (old('role', $user->role) == 'admin') ? 'selected' : '' }}>Administrator</option>
@@ -51,14 +50,14 @@
         {{-- Jurusan --}}
         <div>
             <x-input-label for="jurusan" :value="__('Jurusan')" />
-            <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full" :value="old('jurusan', $user->jurusan)" required autofocus autocomplete="jurusan" />
+            <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full" :value="old('jurusan', $user->jurusan)" autofocus autocomplete="jurusan" />
             <x-input-error class="mt-2" :messages="$errors->get('jurusan')" />
         </div>
 
         {{-- Instansi --}}
         <div>
             <x-input-label for="instansi" :value="__('Instansi')" />
-            <x-text-input id="instansi" name="instansi" type="text" class="mt-1 block w-full" :value="old('instansi', $user->instansi)" required autofocus autocomplete="instansi" />
+            <x-text-input id="instansi" name="instansi" type="text" class="mt-1 block w-full" :value="old('instansi', $user->instansi)" autofocus autocomplete="instansi" />
             <x-input-error class="mt-2" :messages="$errors->get('instansi')" />
         </div>
 

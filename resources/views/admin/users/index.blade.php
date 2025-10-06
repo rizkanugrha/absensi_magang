@@ -5,9 +5,10 @@
                 {{ __('Manajemen Peserta Magang') }}
             </h2>
             {{-- Tombol Tambah Pengguna --}}
-            <x-primary-button tag="a" href="{{ route('admin.users.create') }}">
+            <a href="{{ route('admin.users.create') }}"
+                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                 {{ __('+ Tambah Peserta Baru') }}
-            </x-primary-button>
+            </a>
         </div>
     </x-slot>
 
@@ -81,7 +82,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                                {{ $user->role == 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
+                                                                    {{ $user->role == 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
                                                 {{ ucfirst($user->role) }}
                                             </span>
                                         </td>
