@@ -29,10 +29,16 @@ class AdminDashboard extends Controller
             ->limit(5)
             ->get();
 
+            $countLatestAttendances = Attendance::with('user')
+            ->latest()
+            ->limit(5)
+            ->get()->count();
+
         return view('admin.dashboard', [
             'totalPeserta' => $totalPeserta,
             'todayAttendanceCount' => $todayAttendanceCount,
             'latestAttendances' => $latestAttendances,
+            'countLatestAttendances' => $countLatestAttendances,
         ]);
     }
 }

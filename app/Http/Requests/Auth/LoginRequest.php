@@ -21,7 +21,7 @@ class LoginRequest extends FormRequest
         return [
             'user_id' => ['required', 'string'],
             'password' => ['required', 'string'],
-            'role' => ['required', 'string'],
+            'role' => ['required', 'in:admin,peserta'],
         ];
     }
 
@@ -49,6 +49,7 @@ class LoginRequest extends FormRequest
 
         RateLimiter::clear($this->throttleKey());
     }
+
 
     public function ensureIsNotRateLimited(): void
     {

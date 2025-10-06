@@ -14,13 +14,17 @@
                 <span class="text-lg font-bold text-gray-800">AttendanceTracker</span>
             </div>
             <nav class="mt-6">
-                <a href="{{ route('dashboard') }}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
+                {{-- Dashboard --}}
+                <a href="{{ route('peserta.dashboard') }}"
+                    class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path d="M10 2a8 8 0 100 16 8 8 0 000-16z" />
                     </svg>
                     Dashboard
                 </a>
+                {{-- Attendance (Check-in/out) --}}
+                {{-- ✅ FIX 1: Menggunakan nama rute yang telah disingkat (attendance.index) --}}
                 <a href="{{ route('attendance.index') }}"
                     class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
@@ -30,6 +34,9 @@
                     </svg>
                     Attendance
                 </a>
+                {{-- Daily Recap (Halaman Aktif) --}}
+                {{-- ✅ FIX 2: Menggunakan nama rute yang telah disingkat (attendance.rekap) DAN set sebagai item aktif
+                --}}
                 <a href="{{ route('attendance.rekap') }}"
                     class="flex items-center px-6 py-3 text-blue-600 bg-blue-50 font-medium">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
@@ -52,7 +59,10 @@
             @endif
 
             <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Rekapitulasi Absensi</h2>
+
                 {{-- Filter --}}
+                {{-- ✅ FIX 3: Menggunakan nama rute yang disingkat (rekap) untuk form action --}}
                 <form method="GET" action="{{ route('rekap') }}" class="flex flex-wrap items-center gap-2 mb-4">
                     <input type="text" name="search" placeholder="Search records..." value="{{ request('search') }}"
                         class="border rounded px-3 py-1 text-sm">
@@ -74,16 +84,17 @@
                     <table id="myTable" class="w-full border text-left text-sm">
                         <thead>
                             <tr class="border-b bg-gray-50 text-gray-600">
-                                <th class="px-3 py-2 w-40">Date</th> {{-- Lebar diperbesar --}}
+                                <th class="px-3 py-2 w-40">Date</th>
                                 <th class="px-3 py-2">Check In Photo</th>
                                 <th class="px-3 py-2">Check Out Photo</th>
                                 <th class="px-3 py-2">Daily Report</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($attendances as $attendance)
+                            {{-- ✅ FIX 4: Menambahkan cek pagination untuk menghindari error jika $attendances null --}}
+                            @forelse($attendances ?? [] as $attendance)
                                 <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-3 py-2 w-5"> {{-- Sesuaikan dengan header --}}
+                                    <td class="px-3 py-2 w-5">
                                         {{ $attendance->date }}
                                     </td>
                                     <td class="px-3 py-2">
@@ -119,15 +130,18 @@
 
 
                 {{-- Pagination --}}
-                <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
-                    <div>
-                        Showing {{ $attendances->firstItem() }} to {{ $attendances->lastItem() }}
-                        of {{ $attendances->total() }} records
+                {{-- ✅ FIX 5: Hanya tampilkan pagination jika $attendances adalah objek Pagination --}}
+                @if(isset($attendances) && method_exists($attendances, 'links'))
+                    <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
+                        <div>
+                            Showing {{ $attendances->firstItem() }} to {{ $attendances->lastItem() }}
+                            of {{ $attendances->total() }} records
+                        </div>
+                        <div>
+                            {{ $attendances->links() }}
+                        </div>
                     </div>
-                    <div>
-                        {{ $attendances->links() }}
-                    </div>
-                </div>
+                @endif
             </div>
         </main>
     </div>

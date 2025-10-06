@@ -11,6 +11,6 @@ class PesertaDashboard extends Controller
 {
     public function index()
     {
-        return view('peserta.dashboard-user'); // Pastikan file ini ada di resources/views/dashboard-user.blade.php
+        return view('peserta.dashboard'); // Pastikan file ini ada di resources/views/dashboard-user.blade.php
     }
 }

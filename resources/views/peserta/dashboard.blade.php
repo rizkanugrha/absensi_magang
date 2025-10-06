@@ -5,38 +5,41 @@
         <aside class="w-64 bg-white border-r">
             <div class="p-6 flex items-center space-x-2">
                 <div class="bg-blue-500 text-white p-2 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" 
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M3 7h18M3 12h18M3 17h18" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 7h18M3 12h18M3 17h18" />
                     </svg>
                 </div>
                 <span class="text-lg font-bold text-gray-800">AttendanceTracker</span>
             </div>
             <nav class="mt-6">
-                <a href="{{ route('dashboard') }}" 
-                   class="flex items-center px-6 py-3 text-blue-600 bg-blue-50 font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" 
-                         viewBox="0 0 20 20" fill="currentColor">
+                {{-- Dashboard (Aktif) --}}
+                <a href="{{ route('peserta.dashboard') }}"
+                    class="flex items-center px-6 py-3 text-blue-600 bg-blue-50 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                        fill="currentColor">
                         <path d="M10 2a8 8 0 100 16 8 8 0 000-16z" />
                     </svg>
                     Dashboard
                 </a>
-                <a href="{{ route('attendance.index') }}" 
-                   class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" 
-                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                {{-- Attendance (Check-in/out) --}}
+                <a href="{{ route('attendance.index') }}"
+                    class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Attendance
                 </a>
-                <a href="{{ route('attendance.rekap') }}" 
-                   class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" 
-                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M3 10h11M9 21V3m12 18V3" />
+                {{-- Daily Recap --}}
+                <a href="{{ route('attendance.rekap') }}"
+                    class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h11M9 21V3m12 18V3" />
                     </svg>
                     Daily Recap
                 </a>
@@ -45,11 +48,13 @@
 
         <!-- Main Content -->
         <main class="flex-1 p-6">
-            
+
             <!-- Welcome -->
             <div class="bg-white p-6 shadow rounded-lg mb-6">
-                <h3 class="text-lg font-bold">Selamat Datang, {{ Auth::user()->name ?? 'User' }}!</h3>
-                <p class="text-gray-600">Gunakan dashboard ini untuk melihat ringkasan rapat, agenda, dan kehadiran DPR.</p>
+                {{-- ✅ FIX 3: Menggunakan Null Safe Operator untuk Auth::user() --}}
+                <h3 class="text-lg font-bold">Selamat Datang, {{ Auth::user()?->name ?? 'User' }}!</h3>
+                <p class="text-gray-600">Gunakan dashboard ini untuk melihat ringkasan rapat, agenda, dan kehadiran DPR.
+                </p>
             </div>
 
             <!-- Summary Cards -->
@@ -102,15 +107,30 @@
     <!-- Chart.js Script -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Hadir', 'Izin', 'Alpha'],
-                datasets: [{
-                    data: [120, 15, 5],
-                    backgroundColor: ['#16a34a', '#facc15', '#ef4444']
-                }]
+        // Pastikan DOM sudah dimuat sebelum menjalankan script chart
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('attendanceChart');
+
+            // Cek jika canvas element ditemukan
+            if (ctx) {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Hadir', 'Izin', 'Alpha'],
+                        datasets: [{
+                            data: [120, 15, 5],
+                            backgroundColor: ['#16a34a', '#facc15', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                        }
+                    }
+                });
             }
         });
     </script>

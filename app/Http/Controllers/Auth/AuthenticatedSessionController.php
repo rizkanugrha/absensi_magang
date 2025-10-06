@@ -16,23 +16,23 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
 
-        // Validasi role dari DB vs role input
-        if (Auth::user()->role !== $request->role) {
-            Auth::logout();
-            return back()->withErrors([
-                'role' => 'Role tidak sesuai dengan akun ini.',
-            ]);
-        }
+        // ✅ FIX: Gunakan autentikasi yang sudah memasukkan role.
+        // Jika Auth::attempt di LoginRequest berhasil, role sudah sesuai.
 
         // Redirect sesuai role
         return match (Auth::user()->role) {
-            'admin' => redirect()->intended('/admin/dashboard'),
-            'peserta' => redirect()->intended('/peserta/dashboard'),
+            // Mengganti intended('/admin/dashboard') menjadi redirect()->route('admin.dashboard')
+            'admin' => redirect()->route('admin.dashboard'),
+
+            // Mengganti intended('/dashboard') menjadi redirect()->route('peserta.dashboard')
+            'peserta' => redirect()->route('peserta.dashboard'),
+
             default => redirect('/'),
         };
     }
@@ -43,7 +43,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }
