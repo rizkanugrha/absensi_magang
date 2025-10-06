@@ -168,22 +168,28 @@ class AttendanceController extends Controller
 
     public function rekap(Request $request)
     {
-        $query = Attendance::query();
+        // 1. Dapatkan ID pengguna yang sedang login
+        $userId = Auth::id();
+
+        // 2. Inisialisasi query dan filter berdasarkan user_id
+        $query = Attendance::where('user_id', $userId);
 
         // Filter berdasarkan search (daily_report / date)
         if ($request->search) {
-            $query->where('daily_report', 'like', '%' . $request->search . '%')
-                ->orWhere('date', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('daily_report', 'like', '%' . $request->search . '%')
+                    ->orWhere('date', 'like', '%' . $request->search . '%');
+            });
         }
 
         // Filter berdasarkan rentang tanggal
         if ($request->start_date && $request->end_date) {
+            // Pastikan format tanggal sudah benar (default Laravel sudah benar)
             $query->whereBetween('date', [$request->start_date, $request->end_date]);
         }
 
         $attendances = $query->orderBy('date', 'desc')->paginate(10);
 
         return view('peserta.attendance.rekap', compact('attendances'));
-
     }
 }
