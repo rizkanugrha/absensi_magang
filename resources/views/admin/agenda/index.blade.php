@@ -1,8 +1,8 @@
+{{-- File: resources/views/admin/agenda/index.blade.php --}}
 <x-app-layout>
     <div class="flex min-h-screen bg-gray-50">
 
-        <!-- Sidebar Admin (Menu Manajemen) -->
-        <aside class="w-64 bg-white border-r shadow-lg">
+       <aside class="w-64 bg-white border-r shadow-lg">
             <div class="p-6 flex items-center space-x-2 border-b">
                 <span class="text-xl font-extrabold text-blue-800">Admin Management</span>
             </div>
@@ -69,82 +69,78 @@
             </nav>
         </aside>
 
-        <!-- Main Content Dashboard -->
-        <main class="flex-1 py-12 px-6">
-            <x-slot name="header">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Admin Dashboard') }}
-                </h2>
-            </x-slot>
-
+        <main class="flex-1 py-10 px-6">
             <div class="max-w-7xl mx-auto">
+                {{-- Notifikasi --}}
+                @if (session('success'))
+                    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if (session('error'))
+                    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Ringkasan Hari Ini</h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        {{-- Total Peserta --}}
-                        <div class="p-4 bg-blue-100 rounded-lg shadow border border-blue-200">
-                            <p class="text-sm font-medium text-blue-600">Total Peserta Magang</p>
-                            <p class="text-3xl font-bold text-blue-900">{{ $totalPeserta }}</p>
-                        </div>
-                        {{-- Absensi Hari Ini --}}
-                        <div class="p-4 bg-green-100 rounded-lg shadow border border-green-200">
-                            <p class="text-sm font-medium text-green-600">Absensi Masuk Hari Ini</p>
-                            <p class="text-3xl font-bold text-green-900">{{ $todayAttendanceCount }}</p>
-                        </div>
-                        {{-- Link ke Manajemen User --}}
-                        <a href="{{ route('admin.users.index') }}"
-                            class="p-4 bg-yellow-100 rounded-lg shadow border border-yellow-200 hover:bg-yellow-200 transition duration-150">
-                            <p class="text-sm font-medium text-yellow-600">Manajemen</p>
-                            <p class="text-xl font-bold text-yellow-900 mt-1">Kelola Peserta &raquo;</p>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-800">Manajemen Agenda Harian</h2>
+                        <a href="{{ route('admin.agenda.create') }}"
+                           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            + Tambah Agenda
                         </a>
                     </div>
 
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $countLatestAttendances }} Absensi Terakhir
-                    </h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Nama Peserta</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tanggal</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Check In</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Check Out</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($latestAttendances as $attendance)
+                                @forelse ($agendas as $agenda)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{-- ✅ FIX: Menggunakan operator Null Safe (?->) --}}
-                                            {{ $attendance->user?->name ?? 'User Dihapus' }}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('d F Y') }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ \Carbon\Carbon::parse($attendance->date)->format('d M Y') }}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $agenda->start_time ?? '00:00' }} - {{ $agenda->end_time ?? '23:59' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $attendance->check_in ?? '-' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $attendance->check_out ?? '-' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                                            {{ $agenda->title }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="{{ $agenda->description }}">
+                                            {{ \Illuminate\Support\Str::limit($agenda->description, 50) }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
+                                            <a href="{{ route('admin.agenda.edit', $agenda) }}"
+                                               class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                            <form action="{{ route('admin.agenda.destroy', $agenda) }}" method="POST"
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus agenda ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-400">
-                                            Belum ada data absensi terbaru.
-                                        </td>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data agenda.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-
+                    
+                    <div class="mt-4">
+                        {{ $agendas->links() }}
+                    </div>
                 </div>
             </div>
         </main>

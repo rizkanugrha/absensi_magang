@@ -24,17 +24,23 @@ class AttendanceController extends Controller
         // $this->middleware('auth');
     }
 
+    /**
+     * Menampilkan halaman utama absensi dengan status hari ini.
+     * Mengirimkan $todayAttendance (bukan semua $attendances) ke view.
+     */
     public function index()
     {
-        $attendances = Attendance::where('user_id', Auth::id())
-            ->orderBy('date', 'desc')
-            ->get();
+        // FIX 1: Ambil hanya data absensi hari ini untuk menentukan status.
+        $todayAttendance = Attendance::where('user_id', Auth::id())
+            ->where('date', now($this->tz)->toDateString())
+            ->first();
 
-        return view('peserta.attendance.index', compact('attendances'));
+        return view('peserta.attendance.index', compact('todayAttendance'));
     }
 
     public function checkIn(Request $request)
     {
+        // ... (Logic checkIn tidak diubah, sudah menggunakan updateOrCreate)
         $request->validate([
             'photo' => 'required|string',
         ]);
@@ -66,6 +72,7 @@ class AttendanceController extends Controller
 
     public function checkOut(Request $request)
     {
+        // ... (Logic checkOut tidak diubah, sudah memiliki logic validasi yang benar)
         $request->validate([
             'photo' => 'required|string',
             'daily_report' => 'required|string',
@@ -82,29 +89,6 @@ class AttendanceController extends Controller
             $folder = 'check_out_photos';
             $path = $this->savePhoto($photoData, $folder);
 
-            // Old Code snippet around line 82:
-/*
-            if ($attendance) {
-                $attendance->update([
-                    'check_out' => now($this->tz)->format('H:i:s'),
-                    'check_out_photo' => $path,
-                    'daily_report' => $request->daily_report,
-                ]);
-            } else {
-                // Kalau tidak ada record checkin, bisa juga create (opsional)
-                Attendance::create([
-                    'user_id' => $userId,
-                    'date' => now($this->tz)->toDateString(),
-                    'check_out' => now($this->tz)->format('H:i:s'),
-                    'check_out_photo' => $path,
-                    'daily_report' => $request->daily_report,
-                ]);
-            }
-
-            return back()->with('success', 'Absen keluar berhasil!');
-*/
-
-            // ✅ FIX: Enforce check-in must exist and check-out must not exist yet.
             $attendance = Attendance::where('user_id', $userId)
                 ->where('date', now($this->tz)->toDateString())
                 ->first();
@@ -118,7 +102,6 @@ class AttendanceController extends Controller
             }
 
             if (!$attendance->check_in) {
-                // Should not happen if checkIn uses updateOrCreate correctly, but good fail-safe
                 return back()->with('error', 'Terjadi kesalahan: Absen masuk belum tercatat dengan benar.');
             }
 
@@ -133,7 +116,7 @@ class AttendanceController extends Controller
         }
 
         return back()->with('error', 'Foto gagal diambil.');
-    } // ... rest of the file
+    }
 
     /**
      * Simpan data URI base64 sebagai file di storage/public/<folder>
@@ -157,6 +140,7 @@ class AttendanceController extends Controller
             $ext = 'jpg';
         }
 
+        // Hapus spasi dan decode
         $data = str_replace(' ', '+', $data);
         $fileName = uniqid('img_') . '.' . $ext;
         $relativePath = $folder . '/' . $fileName;
@@ -166,6 +150,9 @@ class AttendanceController extends Controller
         return $relativePath;
     }
 
+    /**
+     * Menampilkan rekap absensi.
+     */
     public function rekap(Request $request)
     {
         // 1. Dapatkan ID pengguna yang sedang login

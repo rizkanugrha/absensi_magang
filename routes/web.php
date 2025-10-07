@@ -4,10 +4,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Peserta\AttendanceController;
 use App\Http\Controllers\Admin\AdminDashboard;
 use App\Http\Controllers\Peserta\PesertaDashboard;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Admin\UserManagement; // ✅ UserManagement Controller
-use App\Http\Controllers\Admin\AttendanceAdminController; // Attendance Admin Controller
-use App\Http\Controllers\Admin\RekapController; // Rekap Controller
+use App\Http\Controllers\Admin\AgendaController;
+use App\Http\Controllers\Admin\UserManagement;
+use App\Http\Controllers\Admin\AttendanceAdminController;
+use App\Http\Controllers\Admin\RekapController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,6 +31,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('/admin/attendances', AttendanceAdminController::class, [
         'names' => 'admin.attendances',
     ]);
+    // Rute CRUD Agenda
+    Route::resource('/admin/agenda', AgendaController::class, ['names' => 'admin.agenda']);
 
     //  REKAP ABSENSI PERIODE
     Route::get('/admin/rekap', [RekapController::class, 'showRekapForm'])->name('admin.rekap.form');
