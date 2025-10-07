@@ -5,39 +5,42 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="flex min-h-screen bg-gray-50">
+        <x-admin-aside />
+        <main class="flex-1 py-12 px-6">
+            <div class="max-w-7xl mx-auto space-y-6">
 
-            {{-- Tombol Kembali --}}
-            <a href="{{ route('admin.users.index') }}"
-                class="text-indigo-600 hover:text-indigo-900 text-sm mb-4 inline-block">
-                &larr; Kembali ke Daftar Pengguna
-            </a>
+                {{-- Tombol Kembali --}}
+                <a href="{{ route('admin.users.index') }}"
+                    class="text-indigo-600 hover:text-indigo-900 text-sm mb-4 inline-block">
+                    &larr; Kembali ke Daftar Pengguna
+                </a>
 
-            {{-- 1. Update Informasi Pengguna (Nama, ID, Email, Role) --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    {{-- Menggunakan partial khusus admin --}}
-                    @include('admin.users.partials.update-user-information-form')
+                {{-- 1. Update Informasi Pengguna (Nama, ID, Email, Role) --}}
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <div class="max-w-xl">
+                        {{-- Menggunakan partial khusus admin --}}
+                        @include('admin.users.partials.update-user-information-form')
+                    </div>
                 </div>
-            </div>
 
-            {{-- 2. Reset Kata Sandi Pengguna (Oleh Admin) --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    {{-- Menggunakan partial khusus admin --}}
-                    @include('admin.users.partials.reset-user-password-form')
+                {{-- 2. Reset Kata Sandi Pengguna (Oleh Admin) --}}
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <div class="max-w-xl">
+                        {{-- Menggunakan partial khusus admin --}}
+                        @include('admin.users.partials.reset-user-password-form')
+                    </div>
                 </div>
-            </div>
 
-            {{-- 3. Hapus Akun Pengguna --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    {{-- Menggunakan partial khusus admin --}}
-                    @include('admin.users.partials.delete-user-form')
+                {{-- 3. Hapus Akun Pengguna --}}
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <div class="max-w-xl">
+                        {{-- Menggunakan partial khusus admin --}}
+                        @include('admin.users.partials.delete-user-form')
+                    </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
+        </main>
     </div>
 </x-app-layout>

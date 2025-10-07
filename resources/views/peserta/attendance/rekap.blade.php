@@ -1,5 +1,3 @@
-// File: resources/views/peserta/attendance/rekap.blade.php
-
 <x-app-layout>
     {{-- FIX 1: Wrap dengan Alpine.js data untuk manajemen modal (pop-up) --}}
     <div class="flex min-h-screen bg-gray-50" x-data="{ showModal: false, imageUrl: '' }">
@@ -142,7 +140,8 @@
                                         class="px-3 py-2 text-gray-700 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
                                         {{-- Gunakan Str::limit untuk pratinjau, dan title untuk detail --}}
                                         <p title="{{ $attendance->daily_report ?? '-' }}">
-                                            {{ \Illuminate\Support\Str::limit($attendance->daily_report, 50) ?? '-' }}</p>
+                                            {{ \Illuminate\Support\Str::limit($attendance->daily_report, 50) ?? '-' }}
+                                        </p>
                                     </td>
                                 </tr>
                             @empty
