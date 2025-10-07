@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -22,39 +25,40 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Update the user's password.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        try {
+            $validated = $request->validate([
+                'current_password' => ['required', 'string', 'current_password'],
+                'password' => ['required', 'string', Password::defaults(), 'confirmed'],
+            ], [
+                'current_password.required' => 'Kata sandi saat ini wajib diisi.',
+                'current_password.current_password' => 'Kata sandi saat ini tidak cocok.',
+                'password.required' => 'Kata sandi baru wajib diisi.',
+                'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            ]);
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors(), 'updatePassword');
         }
 
-        $request->user()->save();
+        // Cek apakah password baru sama dengan yang lama
+        if (Hash::check($validated['password'], $request->user()->password)) {
+            return redirect()->to(route('profile.edit', [], false) . '#update-password')
+                ->withErrors([
+                    'password' => ['Kata sandi baru tidak boleh sama dengan kata sandi Anda saat ini.'],
+                ], 'updatePassword');
+        }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        // Update password
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
         ]);
 
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return Redirect::route('profile.edit')->with('status', 'password-updated');
     }
+
+
+    // Metode destroy user akan ditambahkan di sini, jika diperlukan
 }

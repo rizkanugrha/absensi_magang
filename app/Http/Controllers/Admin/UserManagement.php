@@ -43,8 +43,8 @@ class UserManagement extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'password_confirmation' => ['required'],
             'role' => ['required', Rule::in(['peserta', 'admin'])],
-            'jurusan' => ['required', 'string', 'max:255'],
-            'instansi' => ['required', 'string', 'max:255'],
+            'jurusan' => ['required', 'string', 'min:5', 'max:255'],
+            'instansi' => ['required', 'string', 'min:5', 'max:255'],
         ]);
 
         User::create([
@@ -79,8 +79,8 @@ class UserManagement extends Controller
             'user_id' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'user_id')->ignore($user->id)],
             'email' => ['sometimes', 'nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'role' => ['sometimes', Rule::in(['peserta', 'admin'])],
-            'jurusan' => ['sometimes', 'string', 'max:255'],
-            'instansi' => ['sometimes', 'string', 'max:255'],
+            'jurusan' => ['sometimes', 'string', 'min:5', 'max:255'],
+            'instansi' => ['sometimes', 'string', 'min:5', 'max:255'],
         ]);
 
         $user->update($data);
